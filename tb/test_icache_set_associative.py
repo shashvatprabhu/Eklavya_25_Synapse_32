@@ -4,24 +4,19 @@ from cocotb.triggers import RisingEdge, Timer
 from cocotb.result import TestFailure
 import random
 
-# Test parameters
 CACHESIZE = 1024
 BLOCKSIZE = 4
 ASSOCIATIVITY = 2
 
-# Function to simulate memory read
 def mem_read(addr):
     return (0xAA << 24) | (addr & 0xFFFFFF)
 
 @cocotb.test()
 async def test_icache_behavior(dut):
-    """Cocotb test for icache_set_associative"""
-
-    # Start clock
-    clock = Clock(dut.clk, 10, units="ns")  # 10ns period -> 100MHz
+  
+    clock = Clock(dut.clk, 10, units="ns") 
     cocotb.start_soon(clock.start())
 
-    # Reset
     dut.reset.value = 1
     dut.iready.value = 0
     dut.ifetch.value = 0
@@ -62,7 +57,7 @@ async def test_icache_behavior(dut):
             fetchaddr = int(dut.fetchaddr.value)
             dut._log.info(f"Miss. Fetching from memory @ 0x{fetchaddr:08X}")
 
-            await RisingEdge(dut.clk)  # Wait before asserting iready
+            await RisingEdge(dut.clk) 
             dut.ifetch.value = mem_read(fetchaddr)
             dut.iready.value = 1
 
@@ -73,9 +68,9 @@ async def test_icache_behavior(dut):
             dut._log.info(f"Memory returned: 0x{int(dut.ifetch.value):08X}")
 
     dut._log.info(f"Total Accesses : {accesses}")
-    dut._log.info(f"Total Hits     : {hitcount}")
-    dut._log.info(f"Total Misses   : {misscount}")
+    dut._log.info(f"Total Hits : {hitcount}")
+    dut._log.info(f"Total Misses : {misscount}")
     hit_rate = (hitcount * 100.0) / accesses
     miss_rate = (misscount * 100.0) / accesses
-    dut._log.info(f"Hit Rate       : {hit_rate:.2f}%")
-    dut._log.info(f"Miss Rate      : {miss_rate:.2f}%")
+    dut._log.info(f"Hit Rate : {hit_rate:.2f}%")
+    dut._log.info(f"Miss Rate : {miss_rate:.2f}%")
